@@ -1,7 +1,7 @@
 import pygame
 
 
-class Player:
+class Player(pygame.sprite.Sprite):
     JUMP_HEIGHT = 5
     MAXIMUM_JUMP_HEIGHT = 20 * JUMP_HEIGHT
 
@@ -12,16 +12,19 @@ class Player:
     HORIZONTAL_ACCELERATION_LOWER_LIMIT = -1 * HORIZONTAL_ACCELERATION_UPPER_LIMIT
 
     def __init__(self):
+        super().__init__()
+        # self.load_frames()
+
         self.x = 300
         self.y = 300
         self.horizontal_acceleration = 0.0
-        self.jump_available = True
-        self.currently_jumping = False
-        self.jump_height = 0  # TMP do wywalenia, potem sprawdzamy czy dotyka czegos
+        # self.jump_available = True
+        # self.currently_jumping = False
+        # self.jump_height = 0  # TMP do wywalenia, potem sprawdzamy czy dotyka czegos
 
         # self.image = pygame.Surface((20, 20))
         # self.image.fill((255, 0, 0))
-        self.image = pygame.image.load("sprites/player/idle1.png")
+        self.image = pygame.image.load("sprites/demon_frames.png")
 
     def calculate_move(self, key_pressed):
         if key_pressed[pygame.K_LEFT]:
@@ -31,27 +34,27 @@ class Player:
         else:
             self.decrease_acceleration()
 
-        if key_pressed[pygame.K_SPACE]:
-            self.proceed_jump()
+        # if key_pressed[pygame.K_SPACE]:
+        #     self.proceed_jump()
 
     def move_player(self, key_pressed):
         self.calculate_move(key_pressed)
         self.x += self.horizontal_acceleration
-        self.jump()
+        # self.jump()
 
-    def jump(self):
-        if self.jump_available:
-            return
-        if self.currently_jumping:
-            self.y -= self.JUMP_HEIGHT
-            self.jump_height += self.JUMP_HEIGHT
-            if self.jump_height > self.MAXIMUM_JUMP_HEIGHT:
-                self.currently_jumping = False
-        else:
-            self.y += self.JUMP_HEIGHT
-            self.jump_height -= self.JUMP_HEIGHT
-            if self.jump_height <= 0:
-                self.jump_available = True
+    # def jump(self):
+    #     if self.jump_available:
+    #         return
+    #     if self.currently_jumping:
+    #         self.y -= self.JUMP_HEIGHT
+    #         self.jump_height += self.JUMP_HEIGHT
+    #         if self.jump_height > self.MAXIMUM_JUMP_HEIGHT:
+    #             self.currently_jumping = False
+    #     else:
+    #         self.y += self.JUMP_HEIGHT
+    #         self.jump_height -= self.JUMP_HEIGHT
+    #         if self.jump_height <= 0:
+    #             self.jump_available = True
 
     def accelerate_right(self):
         self.horizontal_acceleration += self.HORIZONTAL_ACCELERATION_VALUE
@@ -69,10 +72,12 @@ class Player:
         else:
             self.horizontal_acceleration += self.HORIZONTAL_ACCELERATION_VALUE
 
-    def proceed_jump(self):
-        if self.jump_available:
-            self.jump_available = False
-            self.currently_jumping = True
+    # def proceed_jump(self):
+    #     if self.jump_available:
+    #         self.jump_available = False
+    #         self.currently_jumping = True
 
     def get_position(self):
         return self.x, self.y
+
+    # def load_frames(self):

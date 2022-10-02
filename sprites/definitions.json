@@ -1,0 +1,88 @@
+{
+  "demon": {
+    "rotate": {
+      "x_position": "",
+      "y_position": "",
+      "width": "44",
+      "height": "57"
+    },
+    "jump_0": {
+      "x_position": "",
+      "y_position": "",
+      "width": "29",
+      "height": "57"
+    },
+    "jump_1": {
+      "x_position": "",
+      "y_position": "",
+      "width": "29",
+      "height": "52"
+    },
+    "jump_2": {
+      "x_position": "",
+      "y_position": "",
+      "width": "29",
+      "height": "52"
+    },
+    "jump_3": {
+      "x_position": "",
+      "y_position": "",
+      "width": "29",
+      "height": "52"
+    },
+    "walk_0": {
+      "x_position": "",
+      "y_position": "",
+      "width": "28",
+      "height": "52"
+    },
+    "walk_1": {
+      "x_position": "",
+      "y_position": "",
+      "width": "28",
+      "height": "52"
+    },
+    "walk_2": {
+      "x_position": "",
+      "y_position": "",
+      "width": "28",
+      "height": "52"
+    },
+    "idle_0": {
+      "x_position": "",
+      "y_position": "",
+      "width": "30",
+      "height": "52"
+    },
+    "idle_1": {
+      "x_position": "",
+      "y_position": "",
+      "width": "30",
+      "height": "52"
+    },
+    "idle_2": {
+      "x_position": "",
+      "y_position": "",
+      "width": "30",
+      "height": "52"
+    },
+    "idle_3": {
+      "x_position": "",
+      "y_position": "",
+      "width": "30",
+      "height": "52"
+    },
+    "edge_0": {
+      "x_position": "",
+      "y_position": "",
+      "width": "32",
+      "height": "51"
+    },
+    "edge_1": {
+      "x_position": "",
+      "y_position": "",
+      "width": "32",
+      "height": "51"
+    }
+  }
+}
