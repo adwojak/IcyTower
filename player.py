@@ -21,7 +21,7 @@ class Player:
 
         # self.image = pygame.Surface((20, 20))
         # self.image.fill((255, 0, 0))
-        self.image = pygame.image.load("images/player.png")
+        self.image = pygame.image.load("sprites/player/idle1.png")
 
     def calculate_move(self, key_pressed):
         if key_pressed[pygame.K_LEFT]:
