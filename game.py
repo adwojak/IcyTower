@@ -31,7 +31,7 @@ while GAME_LOOP:
     if not exit_game(key_pressed):
         GAME_LOOP = False
 
-    player.move_player(key_pressed)
+    player.update(key_pressed)
 
     screen.blit(player.current_frame, player.get_position())
     pygame.display.flip()
