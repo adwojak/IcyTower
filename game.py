@@ -33,7 +33,7 @@ while GAME_LOOP:
 
     player.move_player(key_pressed)
 
-    screen.blit(player.image, player.get_position())
+    screen.blit(player.current_frame, player.get_position())
     pygame.display.flip()
     clock.tick(FPS)
 
