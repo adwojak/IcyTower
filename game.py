@@ -1,10 +1,11 @@
 import pygame
 from player import Player
+from wall import Background
+from constants import GAME_WIDTH, GAME_HEIGHT
 
 GAME_LOOP = True
-WIDTH = 640
-HEIGHT = 640
-RESOLUTION = (WIDTH, HEIGHT)
+
+RESOLUTION = (GAME_WIDTH, GAME_HEIGHT)
 TITLE_CAPTION = "Icy Tower"
 FPS = 60
 
@@ -15,6 +16,7 @@ pygame.display.set_caption(TITLE_CAPTION)
 clock = pygame.time.Clock()
 
 player = Player()
+background = Background()
 
 
 def exit_game(pressed_key):
@@ -32,8 +34,8 @@ while GAME_LOOP:
         GAME_LOOP = False
 
     player.update(key_pressed)
-
-    screen.blit(player.current_frame, player.get_position())
+    background.draw(screen)
+    player.draw(screen)
     pygame.display.flip()
     clock.tick(FPS)
 

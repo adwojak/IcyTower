@@ -1,0 +1,8 @@
+# Sprites
+WALL_BLOCK_SPRITE = "sprites/wall_block.png"
+
+# Sizes
+GAME_WIDTH = 640
+GAME_HEIGHT = 640
+WALL_BLOCK_WIDTH = 114
+WALL_BLOCK_HEIGHT = 145
