@@ -28,12 +28,12 @@ class Player(pygame.sprite.Sprite):
     EDGE_FRAMES_NAMES = ("edge_0", "edge_1")
     ROTATE_NAME = "rotate"
 
+    x = 300
+    y = 300
     state = STATE_IDLE
     last_updated = 0
     current_frame_index = 0
     horizontal_acceleration = 0.0
-    x = 300
-    y = 300
 
     current_frame = None
     idle_frames = None
@@ -54,6 +54,9 @@ class Player(pygame.sprite.Sprite):
         # self.currently_jumping = False
         # self.jump_height = 0  # TMP do wywalenia, potem sprawdzamy czy dotyka czegos
 
+    def get_position(self):
+        return self.x, self.y
+
     def get_rect(self):
         rect = self.current_frame.get_rect()
         rect.x = self.x
@@ -67,21 +70,34 @@ class Player(pygame.sprite.Sprite):
             self.accelerate_right()
         else:
             self.decrease_acceleration()
+        self.x += self.horizontal_acceleration
 
         # if key_pressed[pygame.K_SPACE]:
         #     self.proceed_jump()
 
-    def update(self, key_pressed):
+    def update(self, key_pressed, background_group):
         self.move_player(key_pressed)
+        self.check_collisions(background_group)
         self.set_state()
         self.animate()
 
     def draw(self, base_surface):
         base_surface.blit(self.current_frame, self.get_position())
 
+    def check_collisions(self, background_group):
+        collisions_sprites = pygame.sprite.spritecollide(self, background_group, False)
+        for sprite in collisions_sprites:
+            if sprite.collision_side == "top":
+                self.y = sprite.rect.top + 1 - self.rect.height
+            elif sprite.collision_side == "right":
+                self.x = sprite.rect.right
+                self.horizontal_acceleration = 0
+            elif sprite.collision_side == "left":
+                self.x = sprite.rect.left - self.rect.width
+                self.horizontal_acceleration = 0
+
     def move_player(self, key_pressed):
         self.calculate_move(key_pressed)
-        self.x += self.horizontal_acceleration
         self.include_gravity()
         # self.jump()
 
@@ -117,7 +133,7 @@ class Player(pygame.sprite.Sprite):
             self.current_frame_index = (self.current_frame_index + 1) % len(self.idle_frames)
             self.current_frame = self.idle_frames[self.current_frame_index]
             self.rect = self.get_rect()
-        pygame.draw.rect(self.current_frame, (255, 0, 0), self.rect, 1)
+        # pygame.draw.rect(self.current_frame, (255, 0, 0), self.rect, 1)
 
         # if (
         #     self.state.startswith("move") or self.state.startswith("jump_")
@@ -171,9 +187,6 @@ class Player(pygame.sprite.Sprite):
             self.horizontal_acceleration -= self.HORIZONTAL_ACCELERATION_VALUE
         else:
             self.horizontal_acceleration += self.HORIZONTAL_ACCELERATION_VALUE
-
-    def get_position(self):
-        return self.x, self.y
 
     def load_frames(self):
         sprite_sheet_loader = SpriteSheetLoader("sprites/demon_sheet.png", "sprites/definitions.json")
