@@ -29,11 +29,12 @@ while GAME_LOOP:
     screen.blit(pygame.image.load(BACKGROUND_PNG), (0, 0))
 
     key_pressed = pygame.key.get_pressed()
+    key_up_events = [key.key for key in pygame.event.get(pygame.KEYUP)]
 
     if not exit_game(key_pressed):
         GAME_LOOP = False
 
-    player.update(key_pressed, background_group)
+    player.update(key_pressed, key_up_events, background_group)
     background_group.draw(screen)
     player.draw(screen)
     pygame.display.flip()

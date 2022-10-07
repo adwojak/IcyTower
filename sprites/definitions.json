@@ -6,6 +6,12 @@
       "width": 44,
       "height": 57
     },
+    "jump": {
+      "x_position": 46,
+      "y_position": 1,
+      "width": 29,
+      "height": 57
+    },
     "jump_0": {
       "x_position": 46,
       "y_position": 1,
