@@ -1,5 +1,16 @@
+from platform import PlatformGenerator
+
 import pygame
-from constants import WALL_BLOCK_SPRITE, WALL_BLOCK_WIDTH, WALL_BLOCK_HEIGHT, GAME_HEIGHT, GAME_WIDTH
+
+from constants import (
+    GAME_HEIGHT,
+    GAME_WIDTH,
+    PLATFORM_ELEMENT_HEIGHT,
+    PLATFORM_ELEMENT_WIDTH,
+    WALL_BLOCK_HEIGHT,
+    WALL_BLOCK_SPRITE,
+    WALL_BLOCK_WIDTH,
+)
 
 
 class WallBlock(pygame.sprite.Sprite):
@@ -29,22 +40,20 @@ class WallBlock(pygame.sprite.Sprite):
 class Background(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
+        self.append_base_platform()
         self.append_wall_blocks()
+
+    def append_base_platform(self):
+        self.add(
+            PlatformGenerator.generate_single_platform(
+                0, GAME_HEIGHT - PLATFORM_ELEMENT_HEIGHT, GAME_WIDTH // PLATFORM_ELEMENT_WIDTH
+            )
+        )
 
     def append_wall_blocks(self):
         for block_counter in range(GAME_HEIGHT // WALL_BLOCK_HEIGHT + 1):
             self.add(WallBlock(0, WALL_BLOCK_HEIGHT * block_counter, "right"))
             self.add(WallBlock(GAME_WIDTH - WALL_BLOCK_WIDTH, WALL_BLOCK_HEIGHT * block_counter, "left"))
-        self.add(WallBlock(500, 400, "top"))
-        self.add(WallBlock(450, 400, "top"))
-        self.add(WallBlock(400, 400, "top"))
-        self.add(WallBlock(350, 400, "top"))
-        self.add(WallBlock(300, 400, "top"))
-        self.add(WallBlock(250, 400, "top"))
-        self.add(WallBlock(200, 400, "top"))
-        self.add(WallBlock(150, 400, "top"))
-        self.add(WallBlock(100, 400, "top"))
-        self.add(WallBlock(50, 400, "top"))
 
     def draw(self, base_surface):
         for sprite in self.sprites():
