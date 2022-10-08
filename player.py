@@ -1,5 +1,6 @@
 import pygame
 
+from constants import GRAVITY_VALUE, VERTICAL_ACCELERATION_STARTING_VALUE, VERTICAL_ACCELERATION_CHANGE_VALUE, HORIZONTAL_ACCELERATION_VALUE, HORIZONTAL_ACCELERATION_MIN, HORIZONTAL_ACCELERATION_MAX, HORIZONTAL_ACCELERATION_UPPER_LIMIT, HORIZONTAL_ACCELERATION_LOWER_LIMIT
 from sprite_sheet_loader import SpriteSheetLoader
 
 STATE_IDLE = "idle"
@@ -7,22 +8,11 @@ STATE_MOVE_LEFT = "move_left"
 STATE_MOVE_RIGHT = "move_right"
 STATE_JUMP = "jump"
 
-GRAVITY_VALUE = 3
-JUMP_HEIGHT = 5
-MAXIMUM_JUMP_HEIGHT = 20 * JUMP_HEIGHT
-
 
 class Player(pygame.sprite.Sprite):
-    HORIZONTAL_ACCELERATION_VALUE = 0.5
-    HORIZONTAL_ACCELERATION_MIN = -3 * HORIZONTAL_ACCELERATION_VALUE
-    HORIZONTAL_ACCELERATION_MAX = 3 * HORIZONTAL_ACCELERATION_VALUE
-    HORIZONTAL_ACCELERATION_UPPER_LIMIT = 20 * HORIZONTAL_ACCELERATION_VALUE
-    HORIZONTAL_ACCELERATION_LOWER_LIMIT = -1 * HORIZONTAL_ACCELERATION_UPPER_LIMIT
-
     WALKING_FRAMES_NAMES = ("walk_0", "walk_1", "walk_0", "walk_2")
     IDLE_FRAMES_NAMES = ("idle_0", "idle_1", "idle_2", "idle_3")
-    ROTATE_NAME = "rotate"
-    JUMP_NAME = "jump"
+    JUMP_NAME = "rotate"
 
     x = 300
     y = 550
@@ -58,9 +48,10 @@ class Player(pygame.sprite.Sprite):
     def draw(self, base_surface):
         base_surface.blit(self.current_frame, self.get_position())
 
-    def update(self, key_pressed, keys_up, background_group):
+    def update(self, key_pressed, keys_up, collision_groups):
         self.move_player(key_pressed, keys_up)
-        self.check_collisions(background_group)
+        for group in collision_groups:
+            self.check_collisions(group)
         self.set_state()
         self.animate()
 
@@ -91,7 +82,7 @@ class Player(pygame.sprite.Sprite):
     def proceed_jump(self):
         self.currently_jumping = True
         self.jump_blocked = True
-        self.vertical_acceleration = 16
+        self.vertical_acceleration = VERTICAL_ACCELERATION_STARTING_VALUE
 
     def check_collisions(self, background_group):
         collisions_sprites = pygame.sprite.spritecollide(self, background_group, False)
@@ -100,6 +91,7 @@ class Player(pygame.sprite.Sprite):
                 if not self.currently_jumping:
                     self.y = sprite.rect.top + 1 - self.rect.height
                     self.jump_blocked = False
+                    self.vertical_acceleration = 0.0
             elif sprite.collision_side == "right":
                 self.x = sprite.rect.right
                 self.horizontal_acceleration = 0
@@ -108,7 +100,9 @@ class Player(pygame.sprite.Sprite):
                 self.horizontal_acceleration = 0
 
     def set_state(self):
-        if self.horizontal_acceleration < 0:
+        if self.vertical_acceleration != 0.0:
+            self.state = STATE_JUMP
+        elif self.horizontal_acceleration < 0:
             self.state = STATE_MOVE_LEFT
         elif self.horizontal_acceleration > 0:
             self.state = STATE_MOVE_RIGHT
@@ -117,6 +111,11 @@ class Player(pygame.sprite.Sprite):
 
     def animate(self):
         current_ticks = pygame.time.get_ticks()
+        if self.state == STATE_JUMP:
+            self.last_updated = current_ticks
+            self.current_frame_index = 0
+            self.current_frame = self.jump_frame
+            self.rect = self.get_rect()
         if self.state.startswith("move") and current_ticks - self.last_updated > 100:
             self.last_updated = current_ticks
             frames_tuple = self.states_map[self.state]
@@ -130,32 +129,31 @@ class Player(pygame.sprite.Sprite):
             self.rect = self.get_rect()
 
     def accelerate_right(self):
-        self.horizontal_acceleration += self.HORIZONTAL_ACCELERATION_VALUE
-        self.horizontal_acceleration = min(self.horizontal_acceleration, self.HORIZONTAL_ACCELERATION_UPPER_LIMIT)
+        self.horizontal_acceleration += HORIZONTAL_ACCELERATION_VALUE
+        self.horizontal_acceleration = min(self.horizontal_acceleration, HORIZONTAL_ACCELERATION_UPPER_LIMIT)
 
     def accelerate_left(self):
-        self.horizontal_acceleration -= self.HORIZONTAL_ACCELERATION_VALUE
-        self.horizontal_acceleration = max(self.horizontal_acceleration, self.HORIZONTAL_ACCELERATION_LOWER_LIMIT)
+        self.horizontal_acceleration -= HORIZONTAL_ACCELERATION_VALUE
+        self.horizontal_acceleration = max(self.horizontal_acceleration, HORIZONTAL_ACCELERATION_LOWER_LIMIT)
 
     def decrease_acceleration(self):
-        if self.HORIZONTAL_ACCELERATION_MIN < self.horizontal_acceleration < self.HORIZONTAL_ACCELERATION_MAX:
+        if HORIZONTAL_ACCELERATION_MIN < self.horizontal_acceleration < HORIZONTAL_ACCELERATION_MAX:
             self.horizontal_acceleration = 0
-        elif self.horizontal_acceleration >= self.HORIZONTAL_ACCELERATION_MAX:
-            self.horizontal_acceleration -= self.HORIZONTAL_ACCELERATION_VALUE
+        elif self.horizontal_acceleration >= HORIZONTAL_ACCELERATION_MAX:
+            self.horizontal_acceleration -= HORIZONTAL_ACCELERATION_VALUE
         else:
-            self.horizontal_acceleration += self.HORIZONTAL_ACCELERATION_VALUE
+            self.horizontal_acceleration += HORIZONTAL_ACCELERATION_VALUE
 
     def decrease_vertical_acceleration(self):
         if self.jump_blocked:
-            self.vertical_acceleration -= 0.5
+            self.vertical_acceleration -= VERTICAL_ACCELERATION_CHANGE_VALUE
             if self.vertical_acceleration <= 0:
                 self.currently_jumping = False
 
     def load_frames(self):
         sprite_sheet_loader = SpriteSheetLoader("sprites/demon_sheet.png", "sprites/definitions.json")
         self.idle_frames = sprite_sheet_loader.parse_sprites(self.IDLE_FRAMES_NAMES)
-        self.rotate_frame = sprite_sheet_loader.parse_sprite(self.ROTATE_NAME)
-        self.jump_frame = sprite_sheet_loader.parse_sprite(self.ROTATE_NAME)
+        self.jump_frame = sprite_sheet_loader.parse_sprite(self.JUMP_NAME)
         self.walking_frames_right = sprite_sheet_loader.parse_sprites(self.WALKING_FRAMES_NAMES)
         self.walking_frames_left = tuple(
             pygame.transform.flip(frame, True, False) for frame in self.walking_frames_right

@@ -1,7 +1,8 @@
 import pygame
 from player import Player
-from wall import Background
+from wall import BackgroundGroup
 from constants import GAME_WIDTH, GAME_HEIGHT, BACKGROUND_PNG
+from platform import PlatformGroup
 
 GAME_LOOP = True
 
@@ -16,7 +17,8 @@ pygame.display.set_caption(TITLE_CAPTION)
 clock = pygame.time.Clock()
 
 player = Player()
-background_group = Background()
+background_group = BackgroundGroup()
+platform_group = PlatformGroup()
 
 
 def exit_game(pressed_key):
@@ -34,7 +36,8 @@ while GAME_LOOP:
     if not exit_game(key_pressed):
         GAME_LOOP = False
 
-    player.update(key_pressed, key_up_events, background_group)
+    player.update(key_pressed, key_up_events, [background_group, platform_group])
+    platform_group.draw(screen)
     background_group.draw(screen)
     player.draw(screen)
     pygame.display.flip()
@@ -42,3 +45,8 @@ while GAME_LOOP:
 
 pygame.quit()
 quit()
+
+# TODO
+# Wejście na platformę z boku
+# Zwiększanie prędkości
+# Usunięcie tła z postaci

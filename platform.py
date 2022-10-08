@@ -1,6 +1,6 @@
 import pygame
-
-from constants import PLATFORM_ELEMENT_HEIGHT, PLATFORM_ELEMENT_WIDTH, PLATFORM_MIDDLE, PLATFORM_START
+import random
+from constants import VERTICAL_ACCELERATION_STARTING_VALUE, BASE_PLATFORM_SPEED, PLATFORM_ELEMENT_HEIGHT, PLATFORM_ELEMENT_WIDTH, PLATFORM_MIDDLE, PLATFORM_START, GAME_HEIGHT, GAME_WIDTH, WALL_BLOCK_WIDTH
 
 LEFT_SIDE_IMAGE = pygame.image.load(PLATFORM_START)
 MIDDLE_IMAGE = pygame.image.load(PLATFORM_MIDDLE)
@@ -20,7 +20,6 @@ class Platform(pygame.sprite.Sprite):
         self.right_side_image = right_side_image
         self.surface = self.generate_platform(middle_repeats)
         self.rect = self.get_rect()
-        pygame.draw.rect(self.surface, (255, 0, 0), self.surface.get_rect(), 1)
 
     def generate_platform(self, middle_repeats):
         width = PLATFORM_ELEMENT_WIDTH * (middle_repeats + 2)
@@ -40,11 +39,40 @@ class Platform(pygame.sprite.Sprite):
     def get_position(self):
         return self.x, self.y
 
-    def draw(self, base_surface):
+    def draw(self, base_surface, platform_speed):
+        if self.y > GAME_HEIGHT:
+            self.kill()
+        self.y += platform_speed
+        self.rect.y += platform_speed
         base_surface.blit(self.surface, self.get_position())
 
 
-class PlatformGenerator:
-    @staticmethod
-    def generate_single_platform(x_position, y_position, middle_repeats):
+class PlatformGroup(pygame.sprite.Group):
+    NEW_PLATFORM_GENERATION_HEIGHT = GAME_HEIGHT - VERTICAL_ACCELERATION_STARTING_VALUE * 10 * 4 + PLATFORM_ELEMENT_HEIGHT
+
+    def __init__(self):
+        super().__init__()
+        self.initialize_platforms()
+
+    def generate_platform_parameters(self):
+        middle_repeats = random.randint(2, 8)
+        platform_width = PLATFORM_ELEMENT_WIDTH * (middle_repeats + 2)
+        platform_x = random.randint(WALL_BLOCK_WIDTH + 5, GAME_WIDTH - WALL_BLOCK_WIDTH - 5 - platform_width)
+        return platform_x, middle_repeats
+
+    def initialize_platforms(self):
+        self.add(self.generate_platform(0, GAME_HEIGHT - PLATFORM_ELEMENT_HEIGHT, GAME_WIDTH // PLATFORM_ELEMENT_WIDTH))
+        for count in range(1, 4):
+            platform_x, middle_repeats = self.generate_platform_parameters()
+            self.add(self.generate_platform(platform_x, GAME_WIDTH - 160 * count, middle_repeats))
+
+    def generate_platform(self, x_position, y_position, middle_repeats):
         return Platform(x_position, y_position, "top", middle_repeats, LEFT_SIDE_IMAGE, MIDDLE_IMAGE, RIGHT_SIDE_IMAGE)
+
+    def draw(self, base_surface):
+        sprites = self.sprites()
+        if len(sprites) < 4:
+            platform_x, middle_repeats = self.generate_platform_parameters()
+            self.add(self.generate_platform(platform_x, self.NEW_PLATFORM_GENERATION_HEIGHT, middle_repeats))
+        for sprite in sprites:
+            sprite.draw(base_surface, BASE_PLATFORM_SPEED)
