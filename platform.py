@@ -1,6 +1,6 @@
 import pygame
 import random
-from constants import VERTICAL_ACCELERATION_STARTING_VALUE, BASE_PLATFORM_SPEED, PLATFORM_ELEMENT_HEIGHT, PLATFORM_ELEMENT_WIDTH, PLATFORM_MIDDLE, PLATFORM_START, GAME_HEIGHT, GAME_WIDTH, WALL_BLOCK_WIDTH
+from constants import NEW_PLATFORM_GENERATION_HEIGHT, BASE_PLATFORM_SPEED, PLATFORM_ELEMENT_HEIGHT, PLATFORM_ELEMENT_WIDTH, PLATFORM_MIDDLE, PLATFORM_START, GAME_HEIGHT, GAME_WIDTH, WALL_BLOCK_WIDTH
 
 LEFT_SIDE_IMAGE = pygame.image.load(PLATFORM_START)
 MIDDLE_IMAGE = pygame.image.load(PLATFORM_MIDDLE)
@@ -39,17 +39,18 @@ class Platform(pygame.sprite.Sprite):
     def get_position(self):
         return self.x, self.y
 
+    def update_vertical(self, value):
+        self.y += value
+        self.rect.y += value
+
     def draw(self, base_surface, platform_speed):
         if self.y > GAME_HEIGHT:
             self.kill()
-        self.y += platform_speed
-        self.rect.y += platform_speed
+        self.update_vertical(platform_speed)
         base_surface.blit(self.surface, self.get_position())
 
 
 class PlatformGroup(pygame.sprite.Group):
-    NEW_PLATFORM_GENERATION_HEIGHT = GAME_HEIGHT - VERTICAL_ACCELERATION_STARTING_VALUE * 10 * 4 + PLATFORM_ELEMENT_HEIGHT
-
     def __init__(self):
         super().__init__()
         self.initialize_platforms()
@@ -73,6 +74,6 @@ class PlatformGroup(pygame.sprite.Group):
         sprites = self.sprites()
         if len(sprites) < 4:
             platform_x, middle_repeats = self.generate_platform_parameters()
-            self.add(self.generate_platform(platform_x, self.NEW_PLATFORM_GENERATION_HEIGHT, middle_repeats))
+            self.add(self.generate_platform(platform_x, NEW_PLATFORM_GENERATION_HEIGHT, middle_repeats))
         for sprite in sprites:
             sprite.draw(base_surface, BASE_PLATFORM_SPEED)

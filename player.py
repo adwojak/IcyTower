@@ -14,8 +14,8 @@ class Player(pygame.sprite.Sprite):
     IDLE_FRAMES_NAMES = ("idle_0", "idle_1", "idle_2", "idle_3")
     JUMP_NAME = "rotate"
 
-    x = 300
-    y = 550
+    x = 300.0
+    y = 550.0
     state = STATE_IDLE
     last_updated = 0
     current_frame_index = 0
@@ -23,6 +23,7 @@ class Player(pygame.sprite.Sprite):
     vertical_acceleration = 0.0
     currently_jumping = False
     jump_blocked = False
+    on_platform = False
 
     current_frame = None
     idle_frames = None
@@ -55,6 +56,14 @@ class Player(pygame.sprite.Sprite):
         self.set_state()
         self.animate()
 
+    def update_vertical(self, value):
+        self.y += value
+        self.rect.y += value
+
+    def update_horizontal(self, value):
+        self.x += value
+        self.rect.x += value
+
     def move_player(self, key_pressed, keys_up):
         self.calculate_move(key_pressed, keys_up)
         self.include_gravity()
@@ -73,11 +82,11 @@ class Player(pygame.sprite.Sprite):
         else:
             self.decrease_vertical_acceleration()
 
-        self.x += self.horizontal_acceleration
-        self.y -= self.vertical_acceleration
+        self.update_horizontal(self.horizontal_acceleration)
+        self.update_vertical(-self.vertical_acceleration)
 
     def include_gravity(self):
-        self.y += GRAVITY_VALUE
+        self.update_vertical(1 if self.on_platform else GRAVITY_VALUE)
 
     def proceed_jump(self):
         self.currently_jumping = True
@@ -86,25 +95,27 @@ class Player(pygame.sprite.Sprite):
 
     def check_collisions(self, background_group):
         collisions_sprites = pygame.sprite.spritecollide(self, background_group, False)
+        self.on_platform = False
         for sprite in collisions_sprites:
             if sprite.collision_side == "top":
+                self.on_platform = True
                 if not self.currently_jumping:
-                    self.y = sprite.rect.top + 1 - self.rect.height
+                    self.y = sprite.rect.top + 5.0 - self.rect.height
                     self.jump_blocked = False
                     self.vertical_acceleration = 0.0
             elif sprite.collision_side == "right":
                 self.x = sprite.rect.right
-                self.horizontal_acceleration = 0
+                self.horizontal_acceleration = 0.0
             elif sprite.collision_side == "left":
                 self.x = sprite.rect.left - self.rect.width
-                self.horizontal_acceleration = 0
+                self.horizontal_acceleration = 0.0
 
     def set_state(self):
         if self.vertical_acceleration != 0.0:
             self.state = STATE_JUMP
-        elif self.horizontal_acceleration < 0:
+        elif self.horizontal_acceleration < 0.0:
             self.state = STATE_MOVE_LEFT
-        elif self.horizontal_acceleration > 0:
+        elif self.horizontal_acceleration > 0.0:
             self.state = STATE_MOVE_RIGHT
         else:
             self.state = STATE_IDLE
@@ -115,18 +126,16 @@ class Player(pygame.sprite.Sprite):
             self.last_updated = current_ticks
             self.current_frame_index = 0
             self.current_frame = self.jump_frame
-            self.rect = self.get_rect()
         if self.state.startswith("move") and current_ticks - self.last_updated > 100:
             self.last_updated = current_ticks
             frames_tuple = self.states_map[self.state]
             self.current_frame_index = (self.current_frame_index + 1) % len(frames_tuple)
             self.current_frame = frames_tuple[self.current_frame_index]
-            self.rect = self.get_rect()
         elif current_ticks - self.last_updated > 150:
             self.last_updated = current_ticks
             self.current_frame_index = (self.current_frame_index + 1) % len(self.idle_frames)
             self.current_frame = self.idle_frames[self.current_frame_index]
-            self.rect = self.get_rect()
+        self.rect = self.get_rect()
 
     def accelerate_right(self):
         self.horizontal_acceleration += HORIZONTAL_ACCELERATION_VALUE
@@ -138,7 +147,7 @@ class Player(pygame.sprite.Sprite):
 
     def decrease_acceleration(self):
         if HORIZONTAL_ACCELERATION_MIN < self.horizontal_acceleration < HORIZONTAL_ACCELERATION_MAX:
-            self.horizontal_acceleration = 0
+            self.horizontal_acceleration = 0.0
         elif self.horizontal_acceleration >= HORIZONTAL_ACCELERATION_MAX:
             self.horizontal_acceleration -= HORIZONTAL_ACCELERATION_VALUE
         else:
@@ -147,7 +156,7 @@ class Player(pygame.sprite.Sprite):
     def decrease_vertical_acceleration(self):
         if self.jump_blocked:
             self.vertical_acceleration -= VERTICAL_ACCELERATION_CHANGE_VALUE
-            if self.vertical_acceleration <= 0:
+            if self.vertical_acceleration <= 0.0:
                 self.currently_jumping = False
 
     def load_frames(self):
