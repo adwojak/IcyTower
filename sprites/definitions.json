@@ -12,30 +12,6 @@
       "width": 29,
       "height": 57
     },
-    "jump_0": {
-      "x_position": 46,
-      "y_position": 1,
-      "width": 29,
-      "height": 57
-    },
-    "jump_1": {
-      "x_position": 76,
-      "y_position": 1,
-      "width": 29,
-      "height": 52
-    },
-    "jump_2": {
-      "x_position": 106,
-      "y_position": 1,
-      "width": 29,
-      "height": 52
-    },
-    "jump_3": {
-      "x_position": 136,
-      "y_position": 1,
-      "width": 29,
-      "height": 52
-    },
     "walk_0": {
       "x_position": 166,
       "y_position": 1,
@@ -77,18 +53,6 @@
       "y_position": 1,
       "width": 30,
       "height": 52
-    },
-    "edge_0": {
-      "x_position": 377,
-      "y_position": 1,
-      "width": 32,
-      "height": 51
-    },
-    "edge_1": {
-      "x_position": 410,
-      "y_position": 1,
-      "width": 32,
-      "height": 51
     }
   }
 }

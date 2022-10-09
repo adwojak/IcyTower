@@ -1,6 +1,6 @@
 import pygame
 
-from constants import GRAVITY_VALUE, VERTICAL_ACCELERATION_STARTING_VALUE, VERTICAL_ACCELERATION_CHANGE_VALUE, HORIZONTAL_ACCELERATION_VALUE, HORIZONTAL_ACCELERATION_MIN, HORIZONTAL_ACCELERATION_MAX, HORIZONTAL_ACCELERATION_UPPER_LIMIT, HORIZONTAL_ACCELERATION_LOWER_LIMIT
+from constants import GRAVITY_VALUE, GAME_HEIGHT, VERTICAL_ACCELERATION_STARTING_VALUE, VERTICAL_ACCELERATION_CHANGE_VALUE, HORIZONTAL_ACCELERATION_VALUE, HORIZONTAL_ACCELERATION_MIN, HORIZONTAL_ACCELERATION_MAX, HORIZONTAL_ACCELERATION_UPPER_LIMIT, HORIZONTAL_ACCELERATION_LOWER_LIMIT
 from sprite_sheet_loader import SpriteSheetLoader
 
 STATE_IDLE = "idle"
@@ -24,6 +24,7 @@ class Player(pygame.sprite.Sprite):
     currently_jumping = False
     jump_blocked = False
     on_platform = False
+    is_alive = True
 
     current_frame = None
     idle_frames = None
@@ -47,6 +48,9 @@ class Player(pygame.sprite.Sprite):
         return rect
 
     def draw(self, base_surface):
+        if self.y > GAME_HEIGHT:
+            self.is_alive = False
+            self.kill()
         base_surface.blit(self.current_frame, self.get_position())
 
     def update(self, key_pressed, keys_up, collision_groups):
@@ -90,12 +94,12 @@ class Player(pygame.sprite.Sprite):
 
     def proceed_jump(self):
         self.currently_jumping = True
-        self.jump_blocked = True
-        self.vertical_acceleration = VERTICAL_ACCELERATION_STARTING_VALUE
+        self.vertical_acceleration = VERTICAL_ACCELERATION_STARTING_VALUE - 1
 
     def check_collisions(self, background_group):
         collisions_sprites = pygame.sprite.spritecollide(self, background_group, False)
         self.on_platform = False
+        self.jump_blocked = True
         for sprite in collisions_sprites:
             if sprite.collision_side == "top":
                 self.on_platform = True

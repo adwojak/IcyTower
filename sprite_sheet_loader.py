@@ -19,5 +19,6 @@ class SpriteSheetLoader:
 
     def get_sprite(self, x_position, y_position, width, height):
         surface = pygame.Surface((width, height))
+        surface.set_colorkey((0, 0, 0))
         surface.blit(self.sprite_sheet, (0, 0), (x_position, y_position, width, height))
         return surface

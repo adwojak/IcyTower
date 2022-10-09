@@ -9,7 +9,7 @@ RIGHT_SIDE_IMAGE = pygame.transform.flip(LEFT_SIDE_IMAGE, True, False)
 
 class Platform(pygame.sprite.Sprite):
     def __init__(
-        self, x_position, y_position, collision_side, middle_repeats, left_side_image, middle_image, right_side_image
+        self, x_position, y_position, collision_side, middle_repeats, left_side_image, middle_image, right_side_image, platform_level
     ):
         super().__init__()
         self.x = x_position
@@ -18,16 +18,18 @@ class Platform(pygame.sprite.Sprite):
         self.left_side_image = left_side_image
         self.middle_image = middle_image
         self.right_side_image = right_side_image
+        self.platform_level = platform_level
+        self.platform_width = PLATFORM_ELEMENT_WIDTH * (middle_repeats + 2)
         self.surface = self.generate_platform(middle_repeats)
         self.rect = self.get_rect()
+        self.font = pygame.font.Font(None, 25)
 
     def generate_platform(self, middle_repeats):
-        width = PLATFORM_ELEMENT_WIDTH * (middle_repeats + 2)
-        surface = pygame.Surface((width, PLATFORM_ELEMENT_HEIGHT))
+        surface = pygame.Surface((self.platform_width, PLATFORM_ELEMENT_HEIGHT))
         surface.blit(self.left_side_image, (0, 0))
         for element in range(middle_repeats):
             surface.blit(self.middle_image, ((element + 1) * PLATFORM_ELEMENT_WIDTH, 0))
-        surface.blit(self.right_side_image, (width - PLATFORM_ELEMENT_WIDTH, 0))
+        surface.blit(self.right_side_image, (self.platform_width - PLATFORM_ELEMENT_WIDTH, 0))
         return surface
 
     def get_rect(self):
@@ -43,14 +45,21 @@ class Platform(pygame.sprite.Sprite):
         self.y += value
         self.rect.y += value
 
+    def generate_text(self):
+        return self.font.render(str(self.platform_level), True, (255, 0, 0))
+
     def draw(self, base_surface, platform_speed):
         if self.y > GAME_HEIGHT:
             self.kill()
         self.update_vertical(platform_speed)
+        text = self.generate_text()
+        self.surface.blit(text, ((self.platform_width - text.get_width()) // 2, 10))
         base_surface.blit(self.surface, self.get_position())
 
 
 class PlatformGroup(pygame.sprite.Group):
+    SCORE = 0
+
     def __init__(self):
         super().__init__()
         self.initialize_platforms()
@@ -68,7 +77,9 @@ class PlatformGroup(pygame.sprite.Group):
             self.add(self.generate_platform(platform_x, GAME_WIDTH - 160 * count, middle_repeats))
 
     def generate_platform(self, x_position, y_position, middle_repeats):
-        return Platform(x_position, y_position, "top", middle_repeats, LEFT_SIDE_IMAGE, MIDDLE_IMAGE, RIGHT_SIDE_IMAGE)
+        platform = Platform(x_position, y_position, "top", middle_repeats, LEFT_SIDE_IMAGE, MIDDLE_IMAGE, RIGHT_SIDE_IMAGE, self.SCORE)
+        self.SCORE += 1
+        return platform
 
     def draw(self, base_surface):
         sprites = self.sprites()

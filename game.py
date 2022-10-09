@@ -36,6 +36,9 @@ while GAME_LOOP:
     if not exit_game(key_pressed):
         GAME_LOOP = False
 
+    if not player.is_alive:
+        GAME_LOOP = False
+
     player.update(key_pressed, key_up_events, [background_group, platform_group])
     platform_group.draw(screen)
     background_group.draw(screen)
@@ -48,5 +51,3 @@ quit()
 
 # TODO
 # Wejście na platformę z boku
-# Zwiększanie prędkości
-# Usunięcie tła z postaci
