@@ -18,7 +18,6 @@ from constants import (
     HORIZONTAL_ACCELERATION_UPPER_LIMIT,
     HORIZONTAL_ACCELERATION_VALUE,
     IDLE_FRAMES_NAMES,
-    JUMP_NAME,
     PLAYER_STARTING_X,
     PLAYER_STARTING_Y,
     STATE_IDLE,
@@ -186,7 +185,7 @@ class Player(Sprite):
     def load_frames(self):
         sprite_sheet_loader = SpriteSheetLoader(DEMON_SHEET, DEMON_DEFINITIONS)
         self.idle_frames = sprite_sheet_loader.parse_sprites(IDLE_FRAMES_NAMES)
-        self.jump_frame = sprite_sheet_loader.parse_sprite(JUMP_NAME)
+        self.jump_frame = sprite_sheet_loader.parse_sprite(STATE_JUMP)
         self.walking_frames_right = sprite_sheet_loader.parse_sprites(WALKING_FRAMES_NAMES)
         self.walking_frames_left = tuple(flip(frame, True, False) for frame in self.walking_frames_right)
         self.current_frame = self.idle_frames[0]

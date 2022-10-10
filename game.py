@@ -1,6 +1,6 @@
 from platform import PlatformGroup
 
-from pygame import K_ESCAPE, KEYUP, QUIT, init
+from pygame import K_ESCAPE, KEYUP, QUIT, init as initialize_game
 from pygame import quit as quit_game
 from pygame.display import flip, set_caption, set_mode
 from pygame.event import get as get_event
@@ -12,18 +12,6 @@ from constants import BACKGROUND_PNG, FPS, RESOLUTION, TITLE_CAPTION
 from player import Player
 from wall import BackgroundGroup
 
-GAME_LOOP = True
-
-init()
-screen = set_mode(RESOLUTION)
-set_caption(TITLE_CAPTION)
-
-clock = Clock()
-
-player = Player()
-background_group = BackgroundGroup()
-platform_group = PlatformGroup()
-
 
 def exit_game(pressed_key):
     if pressed_key[K_ESCAPE]:
@@ -31,24 +19,37 @@ def exit_game(pressed_key):
     return all(event.type != QUIT for event in get_event())
 
 
-while GAME_LOOP:
-    screen.blit(load_image(BACKGROUND_PNG), (0, 0))
+def main():
+    initialize_game()
+    screen = set_mode(RESOLUTION)
+    set_caption(TITLE_CAPTION)
 
-    key_pressed = get_pressed()
-    key_up_events = [key.key for key in get_event(KEYUP)]
+    clock = Clock()
 
-    if not exit_game(key_pressed):
-        GAME_LOOP = False
+    player = Player()
+    background_group = BackgroundGroup()
+    platform_group = PlatformGroup()
 
-    if not player.is_alive:
-        GAME_LOOP = False
+    background_image = load_image(BACKGROUND_PNG)
 
-    player.update(key_pressed, key_up_events, [background_group, platform_group])
-    platform_group.draw(screen)
-    background_group.draw(screen)
-    player.draw(screen)
-    flip()
-    clock.tick(FPS)
+    while player.is_alive:
+        screen.blit(background_image, (0, 0))
 
-quit_game()
-quit()
+        key_pressed = get_pressed()
+        key_up_events = [key.key for key in get_event(KEYUP)]
+
+        if not exit_game(key_pressed):
+            return
+
+        player.update(key_pressed, key_up_events, [background_group, platform_group])
+        platform_group.draw(screen)
+        background_group.draw(screen)
+        player.draw(screen)
+        flip()
+        clock.tick(FPS)
+
+
+if __name__ == "__main__":
+    main()
+    quit_game()
+    quit()
