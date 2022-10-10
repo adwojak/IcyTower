@@ -3,6 +3,8 @@ BACKGROUND_PNG = "sprites/background.png"
 WALL_BLOCK_SPRITE = "sprites/wall_block.png"
 PLATFORM_START = "sprites/platform_start.png"
 PLATFORM_MIDDLE = "sprites/platform_middle.png"
+DEMON_SHEET = "sprites/demon_sheet.png"
+DEMON_DEFINITIONS = "sprites/definitions.json"
 
 # Sizes
 GAME_WIDTH = 600
@@ -25,3 +27,27 @@ GRAVITY_VALUE = 3
 # PLATFORM
 BASE_PLATFORM_SPEED = 1.0
 NEW_PLATFORM_GENERATION_HEIGHT = GAME_HEIGHT - VERTICAL_ACCELERATION_STARTING_VALUE * 10 * 4 + PLATFORM_ELEMENT_HEIGHT
+
+RESOLUTION = (GAME_WIDTH, GAME_HEIGHT)
+TITLE_CAPTION = "Icy Tower"
+FPS = 30
+FONT_SIZE = 25
+
+COLOR_RED = (255, 0, 0)
+COLOR_BLACK = (0, 0, 0)
+
+STATE_IDLE = "idle"
+STATE_MOVE_LEFT = "move_left"
+STATE_MOVE_RIGHT = "move_right"
+STATE_JUMP = "jump"
+
+WALKING_FRAMES_NAMES = ("walk_0", "walk_1", "walk_0", "walk_2")
+IDLE_FRAMES_NAMES = ("idle_0", "idle_1", "idle_2", "idle_3")
+JUMP_NAME = "rotate"
+
+PLAYER_STARTING_X = 300.0
+PLAYER_STARTING_Y = 550.0
+
+COLLISION_SIDE_RIGHT = "right"
+COLLISION_SIDE_LEFT = "left"
+COLLISION_SIDE_TOP = "top"

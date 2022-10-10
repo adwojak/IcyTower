@@ -1,10 +1,14 @@
 from json import load as json_load
-import pygame
+
+from pygame import Surface
+from pygame.image import load as load_image
+
+from constants import COLOR_BLACK
 
 
 class SpriteSheetLoader:
     def __init__(self, sprite_sheet, definition):
-        self.sprite_sheet = pygame.image.load(sprite_sheet)
+        self.sprite_sheet = load_image(sprite_sheet)
         with open(definition) as file_stream:
             self.sprite_data = json_load(file_stream)
 
@@ -18,7 +22,7 @@ class SpriteSheetLoader:
         )
 
     def get_sprite(self, x_position, y_position, width, height):
-        surface = pygame.Surface((width, height))
-        surface.set_colorkey((0, 0, 0))
+        surface = Surface((width, height))
+        surface.set_colorkey(COLOR_BLACK)
         surface.blit(self.sprite_sheet, (0, 0), (x_position, y_position, width, height))
         return surface

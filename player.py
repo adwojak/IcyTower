@@ -1,21 +1,41 @@
-import pygame
+from pygame import K_LEFT, K_RIGHT, K_SPACE
+from pygame.sprite import Sprite
+from pygame.sprite import spritecollide as sprite_collide
+from pygame.time import get_ticks
+from pygame.transform import flip
 
-from constants import GRAVITY_VALUE, GAME_HEIGHT, VERTICAL_ACCELERATION_STARTING_VALUE, VERTICAL_ACCELERATION_CHANGE_VALUE, HORIZONTAL_ACCELERATION_VALUE, HORIZONTAL_ACCELERATION_MIN, HORIZONTAL_ACCELERATION_MAX, HORIZONTAL_ACCELERATION_UPPER_LIMIT, HORIZONTAL_ACCELERATION_LOWER_LIMIT
+from constants import (
+    COLLISION_SIDE_LEFT,
+    COLLISION_SIDE_RIGHT,
+    COLLISION_SIDE_TOP,
+    DEMON_DEFINITIONS,
+    DEMON_SHEET,
+    GAME_HEIGHT,
+    GRAVITY_VALUE,
+    HORIZONTAL_ACCELERATION_LOWER_LIMIT,
+    HORIZONTAL_ACCELERATION_MAX,
+    HORIZONTAL_ACCELERATION_MIN,
+    HORIZONTAL_ACCELERATION_UPPER_LIMIT,
+    HORIZONTAL_ACCELERATION_VALUE,
+    IDLE_FRAMES_NAMES,
+    JUMP_NAME,
+    PLAYER_STARTING_X,
+    PLAYER_STARTING_Y,
+    STATE_IDLE,
+    STATE_JUMP,
+    STATE_MOVE_LEFT,
+    STATE_MOVE_RIGHT,
+    VERTICAL_ACCELERATION_CHANGE_VALUE,
+    VERTICAL_ACCELERATION_STARTING_VALUE,
+    WALKING_FRAMES_NAMES,
+)
 from sprite_sheet_loader import SpriteSheetLoader
 
-STATE_IDLE = "idle"
-STATE_MOVE_LEFT = "move_left"
-STATE_MOVE_RIGHT = "move_right"
-STATE_JUMP = "jump"
 
+class Player(Sprite):
+    x = PLAYER_STARTING_X
+    y = PLAYER_STARTING_Y
 
-class Player(pygame.sprite.Sprite):
-    WALKING_FRAMES_NAMES = ("walk_0", "walk_1", "walk_0", "walk_2")
-    IDLE_FRAMES_NAMES = ("idle_0", "idle_1", "idle_2", "idle_3")
-    JUMP_NAME = "rotate"
-
-    x = 300.0
-    y = 550.0
     state = STATE_IDLE
     last_updated = 0
     current_frame_index = 0
@@ -73,14 +93,14 @@ class Player(pygame.sprite.Sprite):
         self.include_gravity()
 
     def calculate_move(self, key_pressed, keys_up):
-        if key_pressed[pygame.K_LEFT]:
+        if key_pressed[K_LEFT]:
             self.accelerate_left()
-        elif key_pressed[pygame.K_RIGHT]:
+        elif key_pressed[K_RIGHT]:
             self.accelerate_right()
         else:
             self.decrease_acceleration()
 
-        if pygame.K_SPACE in keys_up:
+        if K_SPACE in keys_up:
             if not self.jump_blocked:
                 self.proceed_jump()
         else:
@@ -97,20 +117,20 @@ class Player(pygame.sprite.Sprite):
         self.vertical_acceleration = VERTICAL_ACCELERATION_STARTING_VALUE - 1
 
     def check_collisions(self, background_group):
-        collisions_sprites = pygame.sprite.spritecollide(self, background_group, False)
+        collisions_sprites = sprite_collide(self, background_group, False)
         self.on_platform = False
         self.jump_blocked = True
         for sprite in collisions_sprites:
-            if sprite.collision_side == "top":
+            if sprite.collision_side == COLLISION_SIDE_TOP:
                 self.on_platform = True
                 if not self.currently_jumping:
                     self.y = sprite.rect.top + 5.0 - self.rect.height
                     self.jump_blocked = False
                     self.vertical_acceleration = 0.0
-            elif sprite.collision_side == "right":
+            elif sprite.collision_side == COLLISION_SIDE_RIGHT:
                 self.x = sprite.rect.right
                 self.horizontal_acceleration = 0.0
-            elif sprite.collision_side == "left":
+            elif sprite.collision_side == COLLISION_SIDE_LEFT:
                 self.x = sprite.rect.left - self.rect.width
                 self.horizontal_acceleration = 0.0
 
@@ -125,7 +145,7 @@ class Player(pygame.sprite.Sprite):
             self.state = STATE_IDLE
 
     def animate(self):
-        current_ticks = pygame.time.get_ticks()
+        current_ticks = get_ticks()
         if self.state == STATE_JUMP:
             self.last_updated = current_ticks
             self.current_frame_index = 0
@@ -164,13 +184,11 @@ class Player(pygame.sprite.Sprite):
                 self.currently_jumping = False
 
     def load_frames(self):
-        sprite_sheet_loader = SpriteSheetLoader("sprites/demon_sheet.png", "sprites/definitions.json")
-        self.idle_frames = sprite_sheet_loader.parse_sprites(self.IDLE_FRAMES_NAMES)
-        self.jump_frame = sprite_sheet_loader.parse_sprite(self.JUMP_NAME)
-        self.walking_frames_right = sprite_sheet_loader.parse_sprites(self.WALKING_FRAMES_NAMES)
-        self.walking_frames_left = tuple(
-            pygame.transform.flip(frame, True, False) for frame in self.walking_frames_right
-        )
+        sprite_sheet_loader = SpriteSheetLoader(DEMON_SHEET, DEMON_DEFINITIONS)
+        self.idle_frames = sprite_sheet_loader.parse_sprites(IDLE_FRAMES_NAMES)
+        self.jump_frame = sprite_sheet_loader.parse_sprite(JUMP_NAME)
+        self.walking_frames_right = sprite_sheet_loader.parse_sprites(WALKING_FRAMES_NAMES)
+        self.walking_frames_left = tuple(flip(frame, True, False) for frame in self.walking_frames_right)
         self.current_frame = self.idle_frames[0]
         self.rect = self.get_rect()
 

@@ -1,20 +1,24 @@
-import pygame
+from platform import PlatformGroup
+
+from pygame import K_ESCAPE, KEYUP, QUIT, init
+from pygame import quit as quit_game
+from pygame.display import flip, set_caption, set_mode
+from pygame.event import get as get_event
+from pygame.image import load as load_image
+from pygame.key import get_pressed
+from pygame.time import Clock
+
+from constants import BACKGROUND_PNG, FPS, RESOLUTION, TITLE_CAPTION
 from player import Player
 from wall import BackgroundGroup
-from constants import GAME_WIDTH, GAME_HEIGHT, BACKGROUND_PNG
-from platform import PlatformGroup
 
 GAME_LOOP = True
 
-RESOLUTION = (GAME_WIDTH, GAME_HEIGHT)
-TITLE_CAPTION = "Icy Tower"
-FPS = 30
+init()
+screen = set_mode(RESOLUTION)
+set_caption(TITLE_CAPTION)
 
-pygame.init()
-screen = pygame.display.set_mode(RESOLUTION)
-pygame.display.set_caption(TITLE_CAPTION)
-
-clock = pygame.time.Clock()
+clock = Clock()
 
 player = Player()
 background_group = BackgroundGroup()
@@ -22,16 +26,16 @@ platform_group = PlatformGroup()
 
 
 def exit_game(pressed_key):
-    if pressed_key[pygame.K_ESCAPE]:
+    if pressed_key[K_ESCAPE]:
         return False
-    return all(event.type != pygame.QUIT for event in pygame.event.get())
+    return all(event.type != QUIT for event in get_event())
 
 
 while GAME_LOOP:
-    screen.blit(pygame.image.load(BACKGROUND_PNG), (0, 0))
+    screen.blit(load_image(BACKGROUND_PNG), (0, 0))
 
-    key_pressed = pygame.key.get_pressed()
-    key_up_events = [key.key for key in pygame.event.get(pygame.KEYUP)]
+    key_pressed = get_pressed()
+    key_up_events = [key.key for key in get_event(KEYUP)]
 
     if not exit_game(key_pressed):
         GAME_LOOP = False
@@ -43,11 +47,8 @@ while GAME_LOOP:
     platform_group.draw(screen)
     background_group.draw(screen)
     player.draw(screen)
-    pygame.display.flip()
+    flip()
     clock.tick(FPS)
 
-pygame.quit()
+quit_game()
 quit()
-
-# TODO
-# Wejście na platformę z boku
