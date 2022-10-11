@@ -37,7 +37,7 @@ class Player(Sprite):
 
     state = STATE_IDLE
     last_updated = 0
-    current_frame_index = 0
+    image_index = 0
     horizontal_acceleration = 0.0
     vertical_acceleration = 0.0
     currently_jumping = False
@@ -45,7 +45,7 @@ class Player(Sprite):
     on_platform = False
     is_alive = True
 
-    current_frame = None
+    image = None
     idle_frames = None
     rotate_frame = None
     jump_frame = None
@@ -58,26 +58,21 @@ class Player(Sprite):
         super().__init__()
         self.load_frames()
 
-    def get_position(self):
-        return self.x, self.y
-
     def get_rect(self):
-        rect = self.current_frame.get_rect()
+        rect = self.image.get_rect()
         rect.x, rect.y = self.x, self.y
         return rect
 
-    def draw(self, base_surface):
-        if self.y > GAME_HEIGHT:
-            self.is_alive = False
-            self.kill()
-        base_surface.blit(self.current_frame, self.get_position())
-
     def update(self, key_pressed, keys_up, collision_groups):
-        self.move_player(key_pressed, keys_up)
+        self.calculate_move(key_pressed, keys_up)
+        self.include_gravity()
         for group in collision_groups:
             self.check_collisions(group)
         self.set_state()
         self.animate()
+        if self.y > GAME_HEIGHT:
+            self.is_alive = False
+            self.kill()
 
     def update_vertical(self, value):
         self.y += value
@@ -86,10 +81,6 @@ class Player(Sprite):
     def update_horizontal(self, value):
         self.x += value
         self.rect.x += value
-
-    def move_player(self, key_pressed, keys_up):
-        self.calculate_move(key_pressed, keys_up)
-        self.include_gravity()
 
     def calculate_move(self, key_pressed, keys_up):
         if key_pressed[K_LEFT]:
@@ -147,17 +138,17 @@ class Player(Sprite):
         current_ticks = get_ticks()
         if self.state == STATE_JUMP:
             self.last_updated = current_ticks
-            self.current_frame_index = 0
-            self.current_frame = self.jump_frame
+            self.image_index = 0
+            self.image = self.jump_frame
         if self.state.startswith("move") and current_ticks - self.last_updated > 100:
             self.last_updated = current_ticks
             frames_tuple = self.states_map[self.state]
-            self.current_frame_index = (self.current_frame_index + 1) % len(frames_tuple)
-            self.current_frame = frames_tuple[self.current_frame_index]
+            self.image_index = (self.image_index + 1) % len(frames_tuple)
+            self.image = frames_tuple[self.image_index]
         elif current_ticks - self.last_updated > 150:
             self.last_updated = current_ticks
-            self.current_frame_index = (self.current_frame_index + 1) % len(self.idle_frames)
-            self.current_frame = self.idle_frames[self.current_frame_index]
+            self.image_index = (self.image_index + 1) % len(self.idle_frames)
+            self.image = self.idle_frames[self.image_index]
         self.rect = self.get_rect()
 
     def accelerate_right(self):
@@ -188,7 +179,7 @@ class Player(Sprite):
         self.jump_frame = sprite_sheet_loader.parse_sprite(STATE_JUMP)
         self.walking_frames_right = sprite_sheet_loader.parse_sprites(WALKING_FRAMES_NAMES)
         self.walking_frames_left = tuple(flip(frame, True, False) for frame in self.walking_frames_right)
-        self.current_frame = self.idle_frames[0]
+        self.image = self.idle_frames[0]
         self.rect = self.get_rect()
 
         self.states_map = {

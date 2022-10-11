@@ -7,10 +7,11 @@ from pygame.event import get as get_event
 from pygame.image import load as load_image
 from pygame.key import get_pressed
 from pygame.time import Clock
+from pygame.sprite import Group
 
 from constants import BACKGROUND_PNG, FPS, RESOLUTION, TITLE_CAPTION
 from player import Player
-from wall import BackgroundGroup
+from wall import generate_walls
 
 
 def exit_game(pressed_key):
@@ -26,8 +27,12 @@ def main():
 
     clock = Clock()
 
+    walls_group = Group(generate_walls())
+    player_group = Group()
+
     player = Player()
-    background_group = BackgroundGroup()
+    player_group.add(player)
+
     platform_group = PlatformGroup()
 
     background_image = load_image(BACKGROUND_PNG)
@@ -41,10 +46,13 @@ def main():
         if not exit_game(key_pressed):
             return
 
-        player.update(key_pressed, key_up_events, [background_group, platform_group])
+        player.update(key_pressed, key_up_events, [walls_group, platform_group])
+
         platform_group.draw(screen)
-        background_group.draw(screen)
-        player.draw(screen)
+
+        walls_group.draw(screen)
+        player_group.draw(screen)
+
         flip()
         clock.tick(FPS)
 
