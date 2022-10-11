@@ -1,5 +1,5 @@
 from platform import generate_new_platforms, generate_starting_platforms
-
+import pygame_menu
 from pygame import K_ESCAPE, KEYUP, QUIT
 from pygame import init as initialize_game
 from pygame import quit as quit_game
@@ -10,7 +10,7 @@ from pygame.key import get_pressed
 from pygame.sprite import Group
 from pygame.time import Clock
 
-from constants import BACKGROUND_PNG, FPS, RESOLUTION, TITLE_CAPTION
+from constants import BACKGROUND_PNG, FPS, RESOLUTION, TITLE_CAPTION, GAME_WIDTH, GAME_HEIGHT
 from player import Player
 from wall import generate_walls
 
@@ -21,13 +21,12 @@ def exit_game(pressed_key):
     return all(event.type != QUIT for event in get_event())
 
 
-def main():
-    initialize_game()
-    screen = set_mode(RESOLUTION)
-    set_caption(TITLE_CAPTION)
+def perform_quit():
+    quit_game()
+    quit()
 
-    clock = Clock()
 
+def main(screen, clock):
     player_group = Group()
     walls_group = Group(generate_walls())
     platforms_group = Group(generate_starting_platforms())
@@ -61,6 +60,14 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-    quit_game()
-    quit()
+    initialize_game()
+    _screen = set_mode(RESOLUTION)
+    set_caption(TITLE_CAPTION)
+    _clock = Clock()
+
+    menu = pygame_menu.Menu(TITLE_CAPTION, GAME_WIDTH, GAME_HEIGHT, theme=pygame_menu.themes.THEME_BLUE)
+    menu.add.button("Start", main, _screen, _clock)
+    menu.add.button("Exit", perform_quit)
+    menu.mainloop(_screen)
+
+    perform_quit()
