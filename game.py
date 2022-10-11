@@ -1,5 +1,5 @@
 from platform import generate_new_platforms, generate_starting_platforms
-import pygame_menu
+
 from pygame import K_ESCAPE, KEYUP, QUIT
 from pygame import init as initialize_game
 from pygame import quit as quit_game
@@ -9,8 +9,10 @@ from pygame.image import load as load_image
 from pygame.key import get_pressed
 from pygame.sprite import Group
 from pygame.time import Clock
+from pygame_menu import Menu
+from pygame_menu.themes import THEME_DARK
 
-from constants import BACKGROUND_PNG, FPS, RESOLUTION, TITLE_CAPTION, GAME_WIDTH, GAME_HEIGHT
+from constants import BACKGROUND_PNG, FPS, GAME_HEIGHT, GAME_WIDTH, RESOLUTION, TITLE_CAPTION
 from player import Player
 from wall import generate_walls
 
@@ -65,7 +67,7 @@ if __name__ == "__main__":
     set_caption(TITLE_CAPTION)
     _clock = Clock()
 
-    menu = pygame_menu.Menu(TITLE_CAPTION, GAME_WIDTH, GAME_HEIGHT, theme=pygame_menu.themes.THEME_BLUE)
+    menu = Menu(TITLE_CAPTION, GAME_WIDTH, GAME_HEIGHT, theme=THEME_DARK)
     menu.add.button("Start", main, _screen, _clock)
     menu.add.button("Exit", perform_quit)
     menu.mainloop(_screen)
