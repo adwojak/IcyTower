@@ -63,11 +63,13 @@ class Player(Sprite):
         rect.x, rect.y = self.x, self.y
         return rect
 
-    def update(self, key_pressed, keys_up, collision_groups):
+    def move(self, key_pressed, keys_up, collision_groups):
         self.calculate_move(key_pressed, keys_up)
         self.include_gravity()
         for group in collision_groups:
             self.check_collisions(group)
+
+    def update(self):
         self.set_state()
         self.animate()
         if self.y > GAME_HEIGHT:

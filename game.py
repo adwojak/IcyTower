@@ -1,13 +1,14 @@
-from platform import PlatformGroup
+from platform import generate_new_platforms, generate_starting_platforms
 
-from pygame import K_ESCAPE, KEYUP, QUIT, init as initialize_game
+from pygame import K_ESCAPE, KEYUP, QUIT
+from pygame import init as initialize_game
 from pygame import quit as quit_game
 from pygame.display import flip, set_caption, set_mode
 from pygame.event import get as get_event
 from pygame.image import load as load_image
 from pygame.key import get_pressed
-from pygame.time import Clock
 from pygame.sprite import Group
+from pygame.time import Clock
 
 from constants import BACKGROUND_PNG, FPS, RESOLUTION, TITLE_CAPTION
 from player import Player
@@ -27,13 +28,12 @@ def main():
 
     clock = Clock()
 
-    walls_group = Group(generate_walls())
     player_group = Group()
+    walls_group = Group(generate_walls())
+    platforms_group = Group(generate_starting_platforms())
 
     player = Player()
     player_group.add(player)
-
-    platform_group = PlatformGroup()
 
     background_image = load_image(BACKGROUND_PNG)
 
@@ -46,10 +46,13 @@ def main():
         if not exit_game(key_pressed):
             return
 
-        player.update(key_pressed, key_up_events, [walls_group, platform_group])
+        generate_new_platforms(platforms_group)
+        player.move(key_pressed, key_up_events, [walls_group, platforms_group])
 
-        platform_group.draw(screen)
+        player_group.update()
+        platforms_group.update()
 
+        platforms_group.draw(screen)
         walls_group.draw(screen)
         player_group.draw(screen)
 
